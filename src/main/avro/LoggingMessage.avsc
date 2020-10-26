@@ -1,0 +1,13 @@
+{
+    "namespace": "translation",
+    "type": "record",
+    "name": "LoggingMessage",
+    "fields": [
+         {
+            "name": "message", "type": "string"
+         },
+         {
+            "name": "type", "type": "string"
+         }
+    ]
+}

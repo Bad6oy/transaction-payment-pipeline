@@ -1,0 +1,16 @@
+{
+    "namespace": "payment",
+    "type": "record",
+    "name": "PaymentData",
+    "fields": [
+         {
+            "name": "from", "type": "string"
+         },
+         {
+            "name": "to", "type": "string"
+         },
+         {
+             "name": "amount", "type": "int"
+         }
+    ]
+}
