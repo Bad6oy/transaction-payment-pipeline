@@ -1,30 +1,54 @@
 package payment
 
 
-import java.nio.file.FileSystems
+import java.nio.file.{FileSystems, Path}
 
-
-import akka.stream.alpakka.file.javadsl.Directory
+import akka.NotUsed
+import akka.stream.IOResult
+import akka.stream.alpakka.file.scaladsl.Directory
+import akka.stream.scaladsl.{FileIO, Framing, RunnableGraph, Source}
+import akka.util.ByteString
+import cloudflow.akkastream.scaladsl.RunnableGraphStreamletLogic
 import cloudflow.akkastream.{AkkaStreamlet, AkkaStreamletLogic}
 import cloudflow.streamlets.StreamletShape
-import cloudflow.streamlets.avro.AvroInlet
-import org.apache.kafka.clients.producer.RoundRobinPartitioner
+import cloudflow.streamlets.avro.AvroOutlet
+import com.typesafe.config.ConfigFactory
+
+import scala.concurrent.Future
+
 
 class FilePaymentIngress extends AkkaStreamlet {
 
-  val pathToDirectory = ""
+  private val delimiter: String = "\n"
+  private val maxFrameLength: Int = 1024
+  private val outTransactionData: AvroOutlet[RawFileData] =
+    AvroOutlet[RawFileData]("out")
 
-  val incomingTransaction = AvroInlet[RawFileData]("in")
-  val outputTransactionData = AvroInlet[RawFileData]("out").withPartitioner(RoundRobinPartitioner)
+  private val dataSourcePath = ConfigFactory.load("local")
+    .getString("cloudflow.file-ingress.volume-mounts.source-data")
 
+  override def shape(): StreamletShape = {
+    StreamletShape.withOutlets(outTransactionData)
+  }
 
-  val fileSystem = FileSystems.getDefault
+  override protected def createLogic(): AkkaStreamletLogic =
+    new RunnableGraphStreamletLogic() {
 
-  //Directory.ls(fileSystem.getPath(pathToDirectory)).flatMapConcat(Directory.ls)
-  override def shape(): StreamletShape = StreamletShape.withOutlets(outputTransactionData)
-  override protected def createLogic(): AkkaStreamletLogic = new AkkaStreamletLogic() {
-    override def run(): Unit = {
-
+      override def runnableGraph(): RunnableGraph[_] =
+        emitDataFromFiles.to(plainSink(outTransactionData))
     }
+
+  private def emitDataFromFiles: Source[RawFileData, NotUsed] = {
+    getFileList.flatMapConcat(path => readData(path))
+  }
+
+  private def readData(path: Path): Source[RawFileData, Future[IOResult]] = {
+    FileIO.fromPath(path).via(Framing.delimiter(
+      ByteString(delimiter), maxFrameLength))
+      .map(s => new RawFileData(s.utf8String))
+  }
+
+  private def getFileList: Source[Path, NotUsed] = {
+    Directory.ls(FileSystems.getDefault.getPath(dataSourcePath)).flatMapConcat(Directory.ls)
   }
 }

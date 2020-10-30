@@ -3,14 +3,6 @@
     "type": "record",
     "name": "RawFileData",
     "fields": [
-        {
-            "name": "from", "type": "string"
-        },
-        {
-            "name": "to", "type": "string"
-        },
-        {
-            "name": "amount", "type": "int"
-        }
+        { "name": "content", "type": "string" }
     ]
 }
