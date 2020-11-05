@@ -13,6 +13,7 @@ import cloudflow.akkastream.{AkkaStreamlet, AkkaStreamletLogic}
 import cloudflow.streamlets.StreamletShape
 import cloudflow.streamlets.avro.AvroOutlet
 import com.typesafe.config.ConfigFactory
+import cloudflow.streamlets.RoundRobinPartitioner
 
 import scala.concurrent.Future
 
@@ -22,7 +23,7 @@ class FilePaymentIngress extends AkkaStreamlet {
   private val delimiter: String = "\n"
   private val maxFrameLength: Int = 1024
   private val outTransactionData: AvroOutlet[RawFileData] =
-    AvroOutlet[RawFileData]("out")
+    AvroOutlet[RawFileData]("out").withPartitioner(RoundRobinPartitioner)
 
   private val dataSourcePath = ConfigFactory.load("local")
     .getString("cloudflow.file-ingress.volume-mounts.source-data")

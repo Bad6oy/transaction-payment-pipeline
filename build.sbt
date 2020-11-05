@@ -1,7 +1,7 @@
 import sbt.Keys.libraryDependencies
 
 lazy val pipeline =  (project in file("."))
-  .enablePlugins(CloudflowApplicationPlugin, CloudflowAkkaPlugin)
+  .enablePlugins(CloudflowApplicationPlugin, CloudflowAkkaPlugin, CloudflowFlinkPlugin)
   .settings(
     scalaVersion := "2.12.12",
     runLocalConfigFile := Some("src/main/resources/local.conf"),

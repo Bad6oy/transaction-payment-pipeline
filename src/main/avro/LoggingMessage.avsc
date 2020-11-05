@@ -1,13 +1,9 @@
 {
-    "namespace": "translation",
+    "namespace": "transaction",
     "type": "record",
     "name": "LoggingMessage",
     "fields": [
-         {
-            "name": "message", "type": "string"
-         },
-         {
-            "name": "type", "type": "string"
-         }
+         { "name": "message", "type": "string" },
+         { "name": "rawContent", "type": "string" }
     ]
 }

@@ -1,5 +1,5 @@
 {
-    "namespace": "translation",
+    "namespace": "transaction",
     "type": "record",
     "name": "ParticipantData",
     "fields": [
