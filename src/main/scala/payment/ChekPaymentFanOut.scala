@@ -23,7 +23,7 @@ class ChekPaymentFanOut extends FlinkStreamlet {
   private val formattedMessageTag = OutputTag[FormattedPayment]("formatted-output")
   private val invalidMessageTag = OutputTag[LoggingMessage]("invalid-output")
 
-  private val regexFilter = ("""<(a-Z)> -> <(a-Z)>: <(\d>""").r
+  private val regexFilter = """<(a-Z)> -> <(a-Z)>: <(\d>)""".r
   private val INVALID_PAYMENT_MESSAGE: String = "Message must have format <NAME1> -> <NAME2>: <VALUE>"
 
 

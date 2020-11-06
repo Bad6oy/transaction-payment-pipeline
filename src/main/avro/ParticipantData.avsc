@@ -3,15 +3,7 @@
     "type": "record",
     "name": "ParticipantData",
     "fields": [
-        {
-            "name": "Id",
-            "type": {
-                "type": "string",
-                "logicalType": "uuid"
-            }
-        },
-        {
-            "name": "balance", "type": "int"
-        }
+        { "name": "id", "type": "string" },
+        { "name": "balance", "type": "int" }
     ]
 }
