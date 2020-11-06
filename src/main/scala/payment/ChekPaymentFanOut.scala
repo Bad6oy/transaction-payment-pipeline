@@ -3,6 +3,7 @@ package payment
 import cloudflow.flink.{FlinkStreamlet, FlinkStreamletLogic}
 import cloudflow.streamlets.avro.{AvroInlet, AvroOutlet}
 import cloudflow.streamlets.{RoundRobinPartitioner, StreamletShape}
+import logging.{LogLevel, WARNING}
 import org.apache.flink.api.scala.createTypeInformation
 import org.apache.flink.streaming.api.functions.ProcessFunction
 import org.apache.flink.streaming.api.scala.OutputTag
@@ -26,6 +27,9 @@ class ChekPaymentFanOut extends FlinkStreamlet {
   private val regexFilter = """<(a-Z)> -> <(a-Z)>: <(\d>)""".r
   private val INVALID_PAYMENT_MESSAGE: String = "Message must have format <NAME1> -> <NAME2>: <VALUE>"
 
+  override def shape(): StreamletShape = {
+    StreamletShape.withInlets(rawPaymentIngress).withOutlets(formattedPaymentEgress, invalidPaymentEgress)
+  }
 
   override protected def createLogic(): FlinkStreamletLogic = new FlinkStreamletLogic() {
     override def buildExecutionGraph(): Unit = {
@@ -45,16 +49,12 @@ class ChekPaymentFanOut extends FlinkStreamlet {
     }
   }
 
-  override def shape(): StreamletShape = {
-    StreamletShape.withInlets(rawPaymentIngress).withOutlets(formattedPaymentEgress, invalidPaymentEgress)
-  }
-
   private def toFormattedPayment(from: String, to: String, amount: String): FormattedPayment = {
     val intAmount = amount.toInt
     new FormattedPayment(from, to, intAmount)
   }
 
   private def toLoggingMessage(string: String): LoggingMessage = {
-    new LoggingMessage(INVALID_PAYMENT_MESSAGE, string)
+    new LoggingMessage(WARNING.level, INVALID_PAYMENT_MESSAGE, string)
   }
 }

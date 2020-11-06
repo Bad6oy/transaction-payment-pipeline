@@ -7,7 +7,7 @@ import cloudflow.streamlets.StreamletShape
 import cloudflow.streamlets.avro.AvroOutlet
 import transaction.ParticipantJsonProtocol.ParticipantInitializerData
 
-class ParticipantInitializerIngress extends AkkaServerStreamlet{
+class ParticipantInitializerIngress extends AkkaServerStreamlet {
 
   private val participantOutlet = AvroOutlet[ParticipantData]("participant-out", _.id)
 
