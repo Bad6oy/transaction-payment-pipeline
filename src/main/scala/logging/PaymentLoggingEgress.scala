@@ -20,11 +20,15 @@ class PaymentLoggingEgress extends AkkaStreamlet {
     }
   }
 
+  private def format(message: LoggingMessage) = {
+    s"${message.message}. Additional information was ${message.content}"
+  }
+
   private def logging = Flow[LoggingMessage]
     .map { message =>
       message.logLevel match {
-        case WARNING.level => log.warn(s"${message.message} with content ${message.rawContent}")
-        case INFO.level => log.info(s"${message.message} with content ${message.rawContent}")
+        case "WARN" => log.warn(format(message))
+        case "INFO" => log.info(format(message))
       }
     }
 }
