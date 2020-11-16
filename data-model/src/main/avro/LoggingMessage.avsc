@@ -1,0 +1,10 @@
+{
+    "namespace": "ru.neoflex.transaction",
+    "type": "record",
+    "name": "LoggingMessage",
+    "fields": [
+         { "name": "message", "type": "string" },
+         { "name": "content", "type": "string" },
+         { "name": "logLevel", "type": "string" }
+    ]
+}

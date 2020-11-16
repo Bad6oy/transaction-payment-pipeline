@@ -1,0 +1,10 @@
+{
+    "namespace": "ru.neoflex.payment",
+    "type": "record",
+    "name": "FormattedPayment",
+    "fields": [
+         { "name": "from", "type": "string" },
+         { "name": "to", "type": "string" },
+         { "name": "amount", "type": "int" }
+    ]
+}

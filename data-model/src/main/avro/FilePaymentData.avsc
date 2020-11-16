@@ -1,0 +1,8 @@
+{
+    "namespace": "ru.neoflex.payment",
+    "type": "record",
+    "name": "RawFileData",
+    "fields": [
+        { "name": "content", "type": "string" }
+    ]
+}

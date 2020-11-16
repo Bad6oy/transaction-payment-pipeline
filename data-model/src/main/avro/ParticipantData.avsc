@@ -1,0 +1,9 @@
+{
+    "namespace": "ru.neoflex.transaction",
+    "type": "record",
+    "name": "ParticipantData",
+    "fields": [
+        { "name": "id", "type": "string" },
+        { "name": "balance", "type": "int" }
+    ]
+}
