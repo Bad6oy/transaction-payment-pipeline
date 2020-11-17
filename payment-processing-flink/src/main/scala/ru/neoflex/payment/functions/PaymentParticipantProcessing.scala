@@ -10,7 +10,7 @@ import ru.neoflex.utility.Messages.{notEnoughMoneyMessage, successfulOperationMe
 
 class PaymentParticipantProcessing extends RichCoFlatMapFunction[FormattedPayment, ParticipantData, LoggingMessage] {
 
-  @transient private var storedParticipantBalance: MapState[String, Int] = _
+  @transient var storedParticipantBalance: MapState[String, Int] = _
 
   override def flatMap1(value: FormattedPayment, out: Collector[LoggingMessage]): Unit = {
     val sender = value.from

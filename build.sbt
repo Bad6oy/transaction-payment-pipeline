@@ -1,7 +1,7 @@
 import sbt.Keys._
 import sbt._
 
-val akkaHttpSprayJson = "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.12"
+val akkaHttpSprayJson = "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.10"
 val log4j2Version    = "2.13.3"
 val log4jApi         = "org.apache.logging.log4j" % "log4j-api" % log4j2Version
 val log4jSlf4j       = "org.apache.logging.log4j" % "log4j-slf4j-impl" % log4j2Version
@@ -98,6 +98,7 @@ lazy val paymentParticipantInitializer = appModule("payment-participant-initiali
   .settings(
     name := "payment-participant-initializer",
     libraryDependencies ++= Seq(
+      akkaHttpSprayJson,
       log4jApi,
       log4jSlf4j,
       log4jCore,
@@ -128,6 +129,8 @@ lazy val datamodel = appModule("data-model")
     commonSettings,
     (sourceGenerators in Compile) += (avroScalaGenerateSpecific in Test).taskValue
   )
+
+
 
 lazy val messageUtility = appModule("message-utility")
   .settings(commonSettings)

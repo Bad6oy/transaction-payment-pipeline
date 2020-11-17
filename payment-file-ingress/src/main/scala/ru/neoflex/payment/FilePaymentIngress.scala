@@ -23,19 +23,14 @@ class FilePaymentIngress extends AkkaStreamlet {
   private val outTransactionData: AvroOutlet[RawFileData] =
     AvroOutlet[RawFileData]("out").withPartitioner(RoundRobinPartitioner)
 
-  private val dataSourcePath = ConfigFactory.load("local")
-    .getString("cloudflow.file-ingress.volume-mounts.source-data")
-
   override def shape(): StreamletShape = {
     StreamletShape.withOutlets(outTransactionData)
   }
 
-  override protected def createLogic(): AkkaStreamletLogic =
-    new RunnableGraphStreamletLogic() {
+  override protected def createLogic(): AkkaStreamletLogic = new RunnableGraphStreamletLogic() {
 
-      override def runnableGraph(): RunnableGraph[_] =
-        emitDataFromFiles.to(plainSink(outTransactionData))
-    }
+    override def runnableGraph(): RunnableGraph[_] = emitDataFromFiles.to(plainSink(outTransactionData))
+  }
 
   private def emitDataFromFiles: Source[RawFileData, NotUsed] = {
     getFileList.flatMapConcat(path => readData(path))
@@ -48,6 +43,8 @@ class FilePaymentIngress extends AkkaStreamlet {
   }
 
   private def getFileList: Source[Path, NotUsed] = {
-    Directory.ls(FileSystems.getDefault.getPath(dataSourcePath)).flatMapConcat(Directory.ls)
+    Directory.ls(FileSystems.getDefault.getPath(ConfigFactory.load("local")
+      .getString("cloudflow.file-ingress.volume-mounts.source-data")))
+      .flatMapConcat(Directory.ls)
   }
 }
