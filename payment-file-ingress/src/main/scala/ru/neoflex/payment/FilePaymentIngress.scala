@@ -20,6 +20,7 @@ class FilePaymentIngress extends AkkaStreamlet {
 
   private val delimiter: String = "\n"
   private val maxFrameLength: Int = 1024
+  private val path = "neoflex.file-ingress.volume-mounts.source-data"
   private val outTransactionData: AvroOutlet[RawFileData] =
     AvroOutlet[RawFileData]("out").withPartitioner(RoundRobinPartitioner)
 
@@ -38,13 +39,12 @@ class FilePaymentIngress extends AkkaStreamlet {
 
   private def readData(path: Path): Source[RawFileData, Future[IOResult]] = {
     FileIO.fromPath(path).via(Framing.delimiter(
-      ByteString(delimiter), maxFrameLength))
+      ByteString(delimiter), maxFrameLength, allowTruncation = true))
       .map(s => new RawFileData(s.utf8String))
   }
 
   private def getFileList: Source[Path, NotUsed] = {
     Directory.ls(FileSystems.getDefault.getPath(ConfigFactory.load("local")
-      .getString("cloudflow.file-ingress.volume-mounts.source-data")))
-      .flatMapConcat(Directory.ls)
+      .getString(path)))
   }
 }

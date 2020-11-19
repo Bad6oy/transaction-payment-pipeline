@@ -2,14 +2,17 @@ import sbt.Keys._
 import sbt._
 
 val akkaHttpSprayJson = "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.10"
-val log4j2Version    = "2.13.3"
-val log4jApi         = "org.apache.logging.log4j" % "log4j-api" % log4j2Version
-val log4jSlf4j       = "org.apache.logging.log4j" % "log4j-slf4j-impl" % log4j2Version
-val log4jCore        = "org.apache.logging.log4j" % "log4j-core" % log4j2Version
-val disruptor        = "com.lmax" % "disruptor" % "3.4.2"
+val log4j2Version    = "2.14.0"
+//val log4jApi         = "org.apache.logging.log4j" % "log4j-api" % log4j2Version
+//val log4jSlf4j       = "org.apache.logging.log4j" % "log4j-slf4j-impl" % log4j2Version
+//val log4jCore        = "org.apache.logging.log4j" % "log4j-core" % log4j2Version
+//val disruptor        = "com.lmax" % "disruptor" % "3.4.2"
 val scalaTest        = "org.scalatest" %% "scalatest" % "3.0.8" % "test"
 val log4j            = "ch.qos.logback" % "logback-classic" % "1.2.3"
 val alpakkaFile      = "com.lightbend.akka"     %% "akka-stream-alpakka-file"  % "2.0.2"
+val akkaSlf4j        = "com.typesafe.akka" %% "akka-slf4j" % "2.6.6"
+val protobuf         = "com.typesafe.akka" %% "akka-protobuf" % "2.6.6"
+val akkaStream       = "com.typesafe.akka" %% "akka-stream" % "2.6.6"
 
 lazy val root = {
   Project(id = "translation-payment-pipeline", base = file("."))
@@ -36,7 +39,12 @@ lazy val cloudflowPipeline = appModule("cloudflow-pipeline")
   .enablePlugins(CloudflowApplicationPlugin)
   .settings(commonSettings)
   .settings(
-    name := "cloudflow-pipeline"
+    name := "cloudflow-pipeline",
+    libraryDependencies ++= Seq(
+    akkaSlf4j,
+    log4j,
+    protobuf
+    )
   )
   .dependsOn(
     paymentChecker,
@@ -52,10 +60,11 @@ lazy val paymentChecker = appModule("payment-checker-flink")
   .settings(
     name := "payment-checker-flink",
     libraryDependencies ++= Seq(
-      log4jApi,
-      log4jSlf4j,
-      log4jCore,
-      disruptor,
+      //log4jApi,
+      //log4jSlf4j,
+      //log4jCore,
+      //disruptor,
+      log4j,
       scalaTest
     )
   )
@@ -68,10 +77,11 @@ lazy val paymentFileIngress = appModule("payment-file-ingress")
     name := "payment-file-ingress",
     libraryDependencies ++= Seq(
       alpakkaFile,
-      log4jApi,
-      log4jSlf4j,
-      log4jCore,
-      disruptor,
+      //log4jApi,
+      //log4jSlf4j,
+      //log4jCore,
+      //disruptor,
+      log4j,
       scalaTest
     )
   )
@@ -83,10 +93,11 @@ lazy val paymentLogger = appModule("payment-logger")
   .settings(
     name := "payment-logger",
     libraryDependencies ++= Seq(
-      log4jApi,
-      log4jSlf4j,
-      log4jCore,
-      disruptor,
+      //log4jApi,
+      //log4jSlf4j,
+      //log4jCore,
+      //disruptor,
+      log4j,
       scalaTest
     )
   )
@@ -99,10 +110,11 @@ lazy val paymentParticipantInitializer = appModule("payment-participant-initiali
     name := "payment-participant-initializer",
     libraryDependencies ++= Seq(
       akkaHttpSprayJson,
-      log4jApi,
-      log4jSlf4j,
-      log4jCore,
-      disruptor,
+      //log4jApi,
+      //log4jSlf4j,
+      //log4jCore,
+      //disruptor,
+      log4j,
       scalaTest
     )
   )
@@ -114,10 +126,11 @@ lazy val paymentProcessing = appModule("payment-processing-flink")
   .settings(
     name := "payment-processing-flink",
     libraryDependencies ++= Seq(
-      log4jApi,
-      log4jSlf4j,
-      log4jCore,
-      disruptor,
+      //log4jApi,
+      //log4jSlf4j,
+      //log4jCore,
+      //disruptor,
+      log4j,
       scalaTest
     )
   )
@@ -129,7 +142,6 @@ lazy val datamodel = appModule("data-model")
     commonSettings,
     (sourceGenerators in Compile) += (avroScalaGenerateSpecific in Test).taskValue
   )
-
 
 
 lazy val messageUtility = appModule("message-utility")
