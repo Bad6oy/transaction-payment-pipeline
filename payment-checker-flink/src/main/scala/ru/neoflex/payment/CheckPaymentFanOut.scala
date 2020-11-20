@@ -1,8 +1,8 @@
 package ru.neoflex.payment
 
 import cloudflow.flink.{FlinkStreamlet, FlinkStreamletLogic}
-import cloudflow.streamlets.{RoundRobinPartitioner, StreamletShape}
 import cloudflow.streamlets.avro.{AvroInlet, AvroOutlet}
+import cloudflow.streamlets.{RoundRobinPartitioner, StreamletShape}
 import org.apache.flink.api.scala.createTypeInformation
 import org.apache.flink.streaming.api.functions.ProcessFunction
 import org.apache.flink.streaming.api.scala.OutputTag
@@ -13,10 +13,10 @@ import ru.neoflex.utility.Messages.{formattedPaymentMessage, invalidPaymentDataM
 
 class CheckPaymentFanOut extends FlinkStreamlet {
 
-  private val formattedPaymentEgress: AvroOutlet[FormattedPayment] =
+  @transient private val formattedPaymentEgress: AvroOutlet[FormattedPayment] =
     AvroOutlet[FormattedPayment]("formatted-payment-out").withPartitioner(RoundRobinPartitioner)
 
-  private val invalidPaymentEgress: AvroOutlet[LoggingMessage] =
+  @transient private val invalidPaymentEgress: AvroOutlet[LoggingMessage] =
     AvroOutlet[LoggingMessage]("invalid-payment-out").withPartitioner(RoundRobinPartitioner)
 
   private val rawPaymentIngress: AvroInlet[RawFileData] = AvroInlet[RawFileData]("raw-payment-in")
@@ -24,9 +24,9 @@ class CheckPaymentFanOut extends FlinkStreamlet {
   private val formattedMessageTag = OutputTag[FormattedPayment]("formatted-output")
   private val invalidMessageTag = OutputTag[LoggingMessage]("invalid-output")
 
-  private val regexFilter = """<(a-Z)> -> <(a-Z)>: <(\d>)""".r
+  private val regexFilter = """<([a-zA-Z]+)> -> <([a-zA-Z]+)>: <([\d]+)>""".r
 
-  override def shape(): StreamletShape = {
+  @transient override def shape(): StreamletShape = {
     StreamletShape.withInlets(rawPaymentIngress).withOutlets(formattedPaymentEgress, invalidPaymentEgress)
   }
 

@@ -12,7 +12,7 @@ class PaymentLoggingEgress extends AkkaStreamlet {
 
   private val in = AvroInlet[LoggingMessage]("in")
 
-  override def shape(): StreamletShape = StreamletShape(in)
+  @transient override def shape(): StreamletShape = StreamletShape(in)
 
   override protected def createLogic(): AkkaStreamletLogic = new RunnableGraphStreamletLogic() {
     override def runnableGraph(): RunnableGraph[_] = {
@@ -29,6 +29,7 @@ class PaymentLoggingEgress extends AkkaStreamlet {
       message.logLevel match {
         case "WARN" => log.warn(format(message))
         case "INFO" => log.info(format(message))
+        case _=> log.info("Another message level: " + message)
       }
     }
 }

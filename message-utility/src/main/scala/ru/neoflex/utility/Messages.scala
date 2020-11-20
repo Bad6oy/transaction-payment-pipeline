@@ -14,23 +14,27 @@ object Messages {
   private val INVALID_PAYMENT_MESSAGE: String = "Message must have format <NAME1> -> <NAME2>: <VALUE>"
 
   def notEnoughMoneyMessage(balance: Int): LoggingMessage = {
-    new LoggingMessage(NOT_ENOUGH + balance, EMPTY_INFO, WARNING.level)
+    new LoggingMessage(message = NOT_ENOUGH + balance, content = EMPTY_INFO,
+      logLevel = WARNING.level)
   }
 
   def successfulOperationMessage(before: Int, after: Int): LoggingMessage = {
-    new LoggingMessage(SUCCESSFUL_TRANSACTION + after, BALANCE_BEFORE + before, INFO.level)
+    new LoggingMessage(message = SUCCESSFUL_TRANSACTION + after, content = BALANCE_BEFORE + before,
+      logLevel = INFO.level)
   }
 
   def userNotFoundMessage(name: String): LoggingMessage = {
-    new LoggingMessage(NOT_FOUND, NAME + name, WARNING.level)
+    new LoggingMessage(message = NOT_FOUND, content = NAME + name,
+      logLevel = WARNING.level)
   }
 
   def invalidPaymentDataMessage(string: String): LoggingMessage = {
-    new LoggingMessage(WARNING.level, INVALID_PAYMENT_MESSAGE, string)
+    new LoggingMessage(message = INVALID_PAYMENT_MESSAGE, content = string,
+      logLevel = WARNING.level)
   }
 
   def formattedPaymentMessage(from: String, to: String, amount: String): FormattedPayment = {
     val intAmount = amount.toInt
-    new FormattedPayment(from, to, intAmount)
+    new FormattedPayment(from = from, to = to, amount = intAmount)
   }
 }

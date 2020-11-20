@@ -9,11 +9,12 @@ import akka.stream.scaladsl.{FileIO, Framing, RunnableGraph, Source}
 import akka.util.ByteString
 import cloudflow.akkastream.scaladsl.RunnableGraphStreamletLogic
 import cloudflow.akkastream.{AkkaStreamlet, AkkaStreamletLogic}
-import cloudflow.streamlets.{RoundRobinPartitioner, StreamletShape}
 import cloudflow.streamlets.avro.AvroOutlet
+import cloudflow.streamlets.{RoundRobinPartitioner, StreamletShape}
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
 
 
 class FilePaymentIngress extends AkkaStreamlet {
@@ -24,7 +25,7 @@ class FilePaymentIngress extends AkkaStreamlet {
   private val outTransactionData: AvroOutlet[RawFileData] =
     AvroOutlet[RawFileData]("out").withPartitioner(RoundRobinPartitioner)
 
-  override def shape(): StreamletShape = {
+  @transient override def shape(): StreamletShape = {
     StreamletShape.withOutlets(outTransactionData)
   }
 
@@ -33,17 +34,19 @@ class FilePaymentIngress extends AkkaStreamlet {
     override def runnableGraph(): RunnableGraph[_] = emitDataFromFiles.to(plainSink(outTransactionData))
   }
 
-  private def emitDataFromFiles: Source[RawFileData, NotUsed] = {
-    getFileList.flatMapConcat(path => readData(path))
+  private def emitDataFromFiles = {
+    Source.tick(1.second, 5.second, NotUsed)
+      .flatMapConcat(getFileList)
+      .flatMapConcat(readData)
   }
 
-  private def readData(path: Path): Source[RawFileData, Future[IOResult]] = {
+  private def readData: Path => Source[RawFileData, Future[IOResult]] = { path: Path =>
     FileIO.fromPath(path).via(Framing.delimiter(
       ByteString(delimiter), maxFrameLength, allowTruncation = true))
       .map(s => new RawFileData(s.utf8String))
   }
 
-  private def getFileList: Source[Path, NotUsed] = {
+  private def getFileList: NotUsed => Source[Path, NotUsed] = { _ =>
     Directory.ls(FileSystems.getDefault.getPath(ConfigFactory.load("local")
       .getString(path)))
   }
