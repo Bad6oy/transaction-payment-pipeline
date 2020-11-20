@@ -19,10 +19,9 @@ import scala.concurrent.duration.DurationInt
 
 class FilePaymentIngress extends AkkaStreamlet {
 
-  private val delimiter: String = "\n"
   private val maxFrameLength: Int = 1024
   private val path = "neoflex.file-ingress.volume-mounts.source-data"
-  private val outTransactionData: AvroOutlet[RawFileData] =
+  @transient private val outTransactionData: AvroOutlet[RawFileData] =
     AvroOutlet[RawFileData]("out").withPartitioner(RoundRobinPartitioner)
 
   @transient override def shape(): StreamletShape = {
@@ -42,7 +41,7 @@ class FilePaymentIngress extends AkkaStreamlet {
 
   private def readData: Path => Source[RawFileData, Future[IOResult]] = { path: Path =>
     FileIO.fromPath(path).via(Framing.delimiter(
-      ByteString(delimiter), maxFrameLength, allowTruncation = true))
+      ByteString(System.lineSeparator()), maxFrameLength, allowTruncation = true))
       .map(s => new RawFileData(s.utf8String))
   }
 

@@ -9,9 +9,9 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 
 class ParticipantInitializerIngress extends AkkaServerStreamlet {
 
-  private val participantOutlet = AvroOutlet[ParticipantData]("out", _.id)
+  @transient private val participantOutlet = AvroOutlet[ParticipantData]("out", _.id)
+
+  @transient override def shape(): StreamletShape = StreamletShape.withOutlets(participantOutlet)
 
   override protected def createLogic(): AkkaStreamletLogic = HttpServerLogic.default(this, participantOutlet)
-
-  override def shape(): StreamletShape = StreamletShape.withOutlets(participantOutlet)
 }

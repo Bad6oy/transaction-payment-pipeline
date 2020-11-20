@@ -19,7 +19,8 @@ class CheckPaymentFanOut extends FlinkStreamlet {
   @transient private val invalidPaymentEgress: AvroOutlet[LoggingMessage] =
     AvroOutlet[LoggingMessage]("invalid-payment-out").withPartitioner(RoundRobinPartitioner)
 
-  private val rawPaymentIngress: AvroInlet[RawFileData] = AvroInlet[RawFileData]("raw-payment-in")
+  @transient private val rawPaymentIngress: AvroInlet[RawFileData] =
+    AvroInlet[RawFileData]("raw-payment-in")
 
   private val formattedMessageTag = OutputTag[FormattedPayment]("formatted-output")
   private val invalidMessageTag = OutputTag[LoggingMessage]("invalid-output")

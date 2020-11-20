@@ -7,7 +7,6 @@ import ru.neoflex.payment.FormattedPayment
 import ru.neoflex.transaction.{LoggingMessage, ParticipantData}
 import ru.neoflex.utility.Messages.{notEnoughMoneyMessage, successfulOperationMessage, userNotFoundMessage}
 
-
 class PaymentParticipantProcessing extends RichCoFlatMapFunction[FormattedPayment, ParticipantData, LoggingMessage] {
 
   @transient var storedParticipantBalance: MapState[String, Int] = _

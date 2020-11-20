@@ -10,7 +10,7 @@ import ru.neoflex.transaction.LoggingMessage
 
 class PaymentLoggingEgress extends AkkaStreamlet {
 
-  private val in = AvroInlet[LoggingMessage]("in")
+  @transient private val in = AvroInlet[LoggingMessage]("in")
 
   @transient override def shape(): StreamletShape = StreamletShape(in)
 
@@ -29,7 +29,7 @@ class PaymentLoggingEgress extends AkkaStreamlet {
       message.logLevel match {
         case "WARN" => log.warn(format(message))
         case "INFO" => log.info(format(message))
-        case _=> log.info("Another message level: " + message)
+        case _ => log.info("Another message level: " + message)
       }
     }
 }
