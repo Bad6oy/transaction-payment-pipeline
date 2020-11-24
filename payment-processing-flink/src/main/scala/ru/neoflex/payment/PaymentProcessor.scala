@@ -28,8 +28,10 @@ class PaymentProcessor extends FlinkStreamlet {
       val formattedPaymentStream: DataStream[FormattedPayment] = readStream(formattedPaymentIn)
       val participantStream: DataStream[ParticipantData] = readStream(participantInitializerIn)
 
-      formattedPaymentStream.connect(participantStream)
+      val paymentParticipantStream =  formattedPaymentStream.connect(participantStream)
         .keyBy(0, 0).flatMap(new PaymentParticipantProcessing)
+
+      writeStream(loggingMessageOut, paymentParticipantStream)
     }
   }
 }

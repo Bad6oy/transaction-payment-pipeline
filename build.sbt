@@ -46,13 +46,6 @@ lazy val cloudflowPipeline = appModule("cloudflow-pipeline")
     protobuf
     )
   )
-  .dependsOn(
-    paymentChecker,
-    paymentFileIngress,
-    paymentParticipantInitializer,
-    paymentProcessing,
-    paymentLogger
-  )
 
 lazy val paymentChecker = appModule("payment-checker-flink")
   .enablePlugins(CloudflowFlinkPlugin)

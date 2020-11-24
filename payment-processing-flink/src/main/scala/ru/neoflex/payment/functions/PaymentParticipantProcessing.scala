@@ -1,6 +1,8 @@
 package ru.neoflex.payment.functions
 
-import org.apache.flink.api.common.state.MapState
+import org.apache.flink.api.common.state.{MapState, MapStateDescriptor}
+import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.functions.co.RichCoFlatMapFunction
 import org.apache.flink.util.Collector
 import ru.neoflex.payment.FormattedPayment
@@ -9,7 +11,17 @@ import ru.neoflex.utility.Messages.{notEnoughMoneyMessage, successfulOperationMe
 
 class PaymentParticipantProcessing extends RichCoFlatMapFunction[FormattedPayment, ParticipantData, LoggingMessage] {
 
+  override def open(parameters: Configuration): Unit = {
+
+    storedParticipantBalance = getRuntimeContext.getMapState(new MapStateDescriptor[String, Int](
+      "storedParticipantBalance",
+      TypeInformation.of(classOf[String]),
+      TypeInformation.of(classOf[Int])))
+    super.open(parameters)
+  }
+
   @transient var storedParticipantBalance: MapState[String, Int] = _
+
 
   override def flatMap1(value: FormattedPayment, out: Collector[LoggingMessage]): Unit = {
     val sender = value.from
@@ -21,7 +33,7 @@ class PaymentParticipantProcessing extends RichCoFlatMapFunction[FormattedPaymen
   }
 
   override def flatMap2(value: ParticipantData, out: Collector[LoggingMessage]): Unit = {
-      storedParticipantBalance.put(value.id, value.balance)
+    storedParticipantBalance.put(value.id, value.balance)
   }
 
   private def reduceSenderBalance(paymentInfo: FormattedPayment, out: Collector[LoggingMessage]): Unit = {
